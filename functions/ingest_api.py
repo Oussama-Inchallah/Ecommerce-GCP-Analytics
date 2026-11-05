@@ -40,16 +40,17 @@ def download_dataset() -> str:
     LOGGER.info("Saved %s rows to %s", len(dataframe), local_file_path) 
     return str(local_file_path)
 
-def upload_to_gcs(local_file_path: str):
+def upload_to_gcs(local_file_path: str) -> str:
     local_file_path = Path(local_file_path)
     bucket_name = _required_setting("GCS_BUCKET")
     project_id = os.getenv("PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
     object_prefix = os.getenv("GCS_OBJECT_PREFIX", DEFAULT_OBJECT_PREFIX).strip("/")
-    run_timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%SZ")
     object_name = f"{object_prefix}/{run_timestamp}_{local_file_path.name}"
 
     client = storage.Client(project=project_id)
     blob = client.bucket(bucket_name).blob(object_name)
+
     blob.upload_from_filename(local_file_path, content_type="text/csv")
     LOGGER.info("Uploaded gs://%s/%s", bucket_name, object_name)
-    return f"gs://{bucket_name}/{object_name}"
+    return object_name
