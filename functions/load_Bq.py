@@ -23,7 +23,7 @@ def _settings() -> tuple[str, str]:
     return PROJECT_ID, BUCKET
 
 
-def find_pending_object() -> str:
+def find_pending_objects() -> list[str]:
     _, bucket_name = _settings()
     blobs = storage.Client(project=PROJECT_ID).list_blobs(
         bucket_name,
@@ -33,13 +33,15 @@ def find_pending_object() -> str:
     if not pending:
         raise FileNotFoundError(f"No files found under gs://{bucket_name}/{RAW_PREFIX}/")
     pending.sort(key=lambda blob: blob.time_created)
-    return pending[0].name
+    return [blob.name for blob in sorted(pending, key=lambda blob: blob.time_created)]
 
 
-def load_amazon_sales(object_name: str) -> dict[str, str | int]:
+def load_amazon_sales(object_names: list[str]) -> dict[str, int | list[str]]:
     project_id, bucket_name = _settings()
-    object_name = Path(object_name).as_posix().lstrip("/")
-    uri = f"gs://{bucket_name}/{object_name}"
+    normalized_names = [
+        Path(object_name).as_posix().lstrip("/") for object_name in object_names
+    ]
+    uris = [f"gs://{bucket_name}/{object_name}" for object_name in normalized_names]
     table_ref = f"{project_id}.{DATASET}.{TABLE}"
     client = bigquery.Client(project=project_id)
 
@@ -71,18 +73,27 @@ def load_amazon_sales(object_name: str) -> dict[str, str | int]:
         write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
     )
 
-    LOGGER.info("Loading %s into %s", uri, table_ref)
-    load_job = client.load_table_from_uri(uri, table_ref, job_config=job_config)
+    LOGGER.info("Loading %s files into %s", len(uris), table_ref)
+    load_job = client.load_table_from_uri(uris, table_ref, job_config=job_config)
     load_job.result()
-    return {"rows_loaded": load_job.output_rows, "object_name": object_name}
+    return {"rows_loaded": load_job.output_rows, "object_names": normalized_names}
 
 
-def move_to_processed(object_name: str) -> str:
+def move_to_processed(object_names: list[str]) -> list[str]:
     _, bucket_name = _settings()
-    source_name = Path(object_name).as_posix().lstrip("/")
-    processed_name = f"processed/{Path(source_name).name}"
     bucket = storage.Client(project=PROJECT_ID).bucket(bucket_name)
-    bucket.copy_blob(bucket.blob(source_name), bucket, processed_name)
-    bucket.delete_blob(source_name)
-    LOGGER.info("Moved gs://%s/%s to gs://%s/%s", bucket_name, source_name, bucket_name, processed_name)
-    return processed_name
+    processed_names = []
+    for object_name in object_names:
+        source_name = Path(object_name).as_posix().lstrip("/")
+        processed_name = f"processed/{Path(source_name).name}"
+        bucket.copy_blob(bucket.blob(source_name), bucket, processed_name)
+        bucket.delete_blob(source_name)
+        processed_names.append(processed_name)
+        LOGGER.info(
+            "Moved gs://%s/%s to gs://%s/%s",
+            bucket_name,
+            source_name,
+            bucket_name,
+            processed_name,
+        )
+    return processed_names
