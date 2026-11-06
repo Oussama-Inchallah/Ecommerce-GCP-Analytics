@@ -5,3 +5,4 @@ apache-airflow-providers-google
 google-cloud-storage
 kagglehub
 kagglehub[pandas-datasets]
+dbt-postgres   # pour tester dbt avec Postgres
