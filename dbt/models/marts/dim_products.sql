@@ -4,5 +4,6 @@ select
     product_name,
     category,
     brand,
-    unit_price   
+    unit_price
 from {{ ref('snap_products') }}
+where product_id is not null

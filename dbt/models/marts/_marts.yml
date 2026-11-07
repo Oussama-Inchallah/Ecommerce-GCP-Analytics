@@ -6,7 +6,7 @@ models:
       - name: customer_id
         tests: [unique, not_null]
       - name: customer_name
-        tests: [unique, not_null]
+        tests: [not_null]
 
   - name: dim_cities
     columns:

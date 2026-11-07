@@ -20,5 +20,5 @@ left join {{ ref('dim_cities') }} as cities
     and orders.state = cities.state
     and orders.country = cities.country
 left join {{ ref('dim_products') }} as products
-    on orders.product_id = products.product_id 
+    on orders.product_id = products.product_id
    
