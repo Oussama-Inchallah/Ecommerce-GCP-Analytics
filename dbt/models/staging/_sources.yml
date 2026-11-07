@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: ecommerce_warehouse
+    database: "target.database"
+    # database: "{{ target.project }}"
+    schema: raw_ecommerce
+    tables:
+      - name: Amazon
+        description: "Raw Amazon sales loaded from GCS."
