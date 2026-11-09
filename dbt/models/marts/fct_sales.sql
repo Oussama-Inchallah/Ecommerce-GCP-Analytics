@@ -3,8 +3,11 @@ select
     orders.customer_id,
     cities.city_id,
     products.product_key,
-    -- cast(format_date('%Y%m%d', orders.order_date) as numeric) as date_key, --- BigQuery
-    cast(to_char(orders.order_date, 'YYYYMMDD') as integer) as date_key,   -- Postgres
+    {% if target.type == 'bigquery' %}
+    cast(format_date('%Y%m%d', orders.order_date) as int64) as date_key,
+    {% else %}
+    cast(to_char(orders.order_date, 'YYYYMMDD') as integer) as date_key,
+    {% endif %}
     orders.seller_id,
     orders.unit_price,
     orders.quantity,

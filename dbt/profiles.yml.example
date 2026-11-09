@@ -1,21 +1,21 @@
 ecommerce_analytics:
-  target: dev
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
   outputs:
-    dev:
+    gcp:
       type: bigquery
-      method: service-account
+      method: oauth
       project: "{{ env_var('PROJECT_ID') }}"
       dataset: dbt_dev
       threads: 4
       location: "{{ env_var('REGION', 'US') }}"
-      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
 
-
-# Pour Tester localement
+# localement avec postgres 
+    dev:
       type: postgres
       host: localhost
       port: 5433
-      user: gcp
-      password: gcp
-      dbname: ecommerce_analytics
+      user: ecom
+      password: ecom
+      dbname: ecommerce_warehouse
       schema: dbt_dev
+      threads: 4
