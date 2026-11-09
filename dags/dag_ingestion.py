@@ -8,7 +8,7 @@ from functions.ingest_api import download_dataset, upload_to_gcs
 with DAG(
     "ecommerce_ingestion_dag",
     schedule="@daily",
-    start_date=datetime(2026, 11, 5),
+    start_date=datetime(2026, 11, 9),
     catchup=False,
 ) as dag:
 

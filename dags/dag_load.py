@@ -3,6 +3,9 @@ import os
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.providers.google.cloud.operators.cloud_run import (
+    CloudRunExecuteJobOperator,
+)
 from airflow.providers.google.cloud.sensors.gcs import (
     GCSObjectsWithPrefixExistenceSensor,
 )
@@ -14,14 +17,17 @@ from functions.load_Bq import (
 )
 
 
-GCS_BUCKET = os.environ["GCS_BUCKET"]
+PROJECT_ID = os.environ["E_PROJECT_ID"]
+REGION = os.getenv("REGION", "europe-west9")
+GCS_BUCKET = os.environ["E_GCS_BUCKET"]
 GCS_OBJECT_PREFIX = os.getenv("GCS_OBJECT_PREFIX", "raw").strip("/")
+DBT_CLOUD_RUN_JOB = os.environ["E_DBT_CLOUD_RUN_JOB"]
 
 
 with DAG(
     "ecommerce_loading_dag",
     schedule="@daily",
-    start_date=datetime(2026, 11, 5),
+    start_date=datetime(2026, 11, 9),
     catchup=False,
     render_template_as_native_obj=True,
 ) as dag:
@@ -30,7 +36,7 @@ with DAG(
         bucket=GCS_BUCKET,
         prefix=f"{GCS_OBJECT_PREFIX}/",
         google_cloud_conn_id="google_cloud_default",
-        poke_interval=1800,
+        poke_interval=120,
         timeout=3600,
         mode="reschedule",
     )
@@ -56,4 +62,12 @@ with DAG(
         },
     )
 
-    wait_for_file >> find_files >> load_to_bq >> move_file
+    dbt_build = CloudRunExecuteJobOperator(
+        task_id="dbt_build",
+        project_id=PROJECT_ID,
+        region=REGION,
+        job_name=DBT_CLOUD_RUN_JOB,
+        gcp_conn_id="google_cloud_default",
+    )
+
+    wait_for_file >> find_files >> load_to_bq >> move_file >> dbt_build
