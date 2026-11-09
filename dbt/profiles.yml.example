@@ -8,14 +8,3 @@ ecommerce_analytics:
       dataset: dbt_dev
       threads: 4
       location: "{{ env_var('REGION', 'US') }}"
-
-# localement avec postgres 
-    dev:
-      type: postgres
-      host: localhost
-      port: 5433
-      user: ecom
-      password: ecom
-      dbname: ecommerce_warehouse
-      schema: dbt_dev
-      threads: 4
