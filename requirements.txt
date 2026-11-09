@@ -1,0 +1,7 @@
+requests
+pandas
+python-dotenv
+apache-airflow-providers-google
+google-cloud-storage
+kagglehub
+kagglehub[pandas-datasets]

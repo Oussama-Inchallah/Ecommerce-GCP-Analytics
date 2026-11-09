@@ -1,0 +1,12 @@
+version: 2
+
+snapshots:
+  - name: snap_products
+    description: "SCD Type 2 history of product attributes."
+    columns:
+      - name: product_id
+        tests: [not_null]
+      - name: dbt_valid_from
+        tests: [not_null]
+      - name: dbt_valid_to
+        description: "Null for the current version."
