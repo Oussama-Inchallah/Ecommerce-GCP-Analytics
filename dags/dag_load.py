@@ -17,11 +17,11 @@ from functions.load_Bq import (
 )
 
 
-PROJECT_ID = os.environ["E_PROJECT_ID"]
+PROJECT_ID = os.environ["PROJECT_ID"]
 REGION = os.getenv("REGION", "europe-west9")
-GCS_BUCKET = os.environ["E_GCS_BUCKET"]
+GCS_BUCKET = os.environ["GCS_BUCKET"]
 GCS_OBJECT_PREFIX = os.getenv("GCS_OBJECT_PREFIX", "raw").strip("/")
-DBT_CLOUD_RUN_JOB = os.environ["E_DBT_CLOUD_RUN_JOB"]
+DBT_CLOUD_RUN_JOB = os.environ["DBT_CLOUD_RUN_JOB"]
 
 
 with DAG(
