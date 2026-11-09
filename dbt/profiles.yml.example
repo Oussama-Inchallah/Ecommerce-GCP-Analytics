@@ -8,3 +8,7 @@ ecommerce_analytics:
       dataset: dbt_dev
       threads: 4
       location: "{{ env_var('REGION', 'US') }}"
+<<<<<<< HEAD
+=======
+
+>>>>>>> terraform
