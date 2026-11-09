@@ -10,7 +10,8 @@ COPY tests ./tests
 
 RUN pip install --no-cache-dir \
     "dbt-bigquery==1.8.2" \
-    "click==8.1.7" \
-    && dbt deps --profiles-dir .
+    "kagglehub==1.0.3" \
+    "python-dotenv==1.2.4" \
+    "click==8.1.7"
 
-CMD ["dbt", "build", "--target", "gcp", "--profiles-dir", "."]
+CMD ["sh", "-c", "dbt deps --profiles-dir . && dbt build --target gcp --profiles-dir ."]
