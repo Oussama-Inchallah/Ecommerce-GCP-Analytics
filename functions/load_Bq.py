@@ -8,10 +8,10 @@ from google.cloud import bigquery, storage
 
 load_dotenv()
 LOGGER = logging.getLogger(__name__)
-PROJECT_ID = os.getenv("PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
+PROJECT_ID = os.getenv("E_PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
 DATASET = "raw_ecommerce"
 TABLE = "amazon_sales"
-BUCKET = os.getenv("GCS_BUCKET")
+BUCKET = os.getenv("E_GCS_BUCKET")
 RAW_PREFIX = os.getenv("GCS_OBJECT_PREFIX", "raw").strip("/")
 
 

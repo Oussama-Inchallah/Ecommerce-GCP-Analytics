@@ -7,6 +7,7 @@ from google.cloud import storage
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 
+load_dotenv()   
 
 LOGGER = logging.getLogger(__name__)
 PROJECT_PATH = Path(__file__).resolve().parents[1]
@@ -42,8 +43,8 @@ def download_dataset() -> str:
 
 def upload_to_gcs(local_file_path: str) -> str:
     local_file_path = Path(local_file_path)
-    bucket_name = _required_setting("GCS_BUCKET")
-    project_id = os.getenv("PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
+    bucket_name = _required_setting("E_GCS_BUCKET")
+    project_id = os.getenv("E_PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT")
     object_prefix = os.getenv("GCS_OBJECT_PREFIX", DEFAULT_OBJECT_PREFIX).strip("/")
     run_timestamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%SZ")
     object_name = f"{object_prefix}/{run_timestamp}_{local_file_path.name}"
